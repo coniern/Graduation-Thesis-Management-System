@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -27,6 +27,38 @@ const latestNews = [
   { id: 3, title: '毕业论文查重系统使用指南', date: '2024-05-05', author: '信息中心' },
   { id: 4, title: '毕业论文格式规范更新通知', date: '2024-04-28', author: '教务处' }
 ]
+
+// 组件挂载时根据用户角色重定向到对应主页
+onMounted(() => {
+  // 获取当前用户角色
+  const userInfoStr = typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : ''
+  if (userInfoStr) {
+    const userInfo = JSON.parse(userInfoStr)
+    const userType = userInfo.userType || 0
+    
+    // 根据角色重定向到对应主页
+    let redirectPath = '/'
+    switch (userType) {
+      case 1: // 学生
+        redirectPath = '/student/home'
+        break
+      case 2: // 教师
+        redirectPath = '/teacher/home'
+        break
+      case 3: // 院系管理员
+      case 4: // 校级管理员
+        redirectPath = '/admin/home'
+        break
+      default:
+        redirectPath = '/login'
+    }
+    
+    // 避免无限重定向
+    if (redirectPath !== '/' && redirectPath !== window.location.pathname) {
+      router.push(redirectPath)
+    }
+  }
+})
 </script>
 
 <template>

@@ -2,8 +2,9 @@ package com.hfuu.auth.controller;
 
 import com.hfuu.auth.entity.StudentInfo;
 import com.hfuu.auth.entity.TeacherInfo;
-import com.hfuu.auth.entity.UserInfo;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,39 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
-
-    /**
-     * 获取所有用户列表
-     * 
-     * @return 用户列表
-     */
-    @GetMapping("/users")
-    public List<UserInfo> getAllUsers() {
-        List<UserInfo> users = new ArrayList<>();
-        
-        UserInfo user1 = new UserInfo();
-        user1.setUserId(1L);
-        user1.setUsername("student");
-        user1.setRealName("张三");
-        user1.setUserType(1);
-        users.add(user1);
-        
-        UserInfo user2 = new UserInfo();
-        user2.setUserId(2L);
-        user2.setUsername("teacher");
-        user2.setRealName("李四");
-        user2.setUserType(2);
-        users.add(user2);
-        
-        UserInfo user3 = new UserInfo();
-        user3.setUserId(3L);
-        user3.setUsername("admin");
-        user3.setRealName("系统管理员");
-        user3.setUserType(4);
-        users.add(user3);
-        
-        return users;
-    }
 
     /**
      * 获取所有学生列表
@@ -111,29 +79,5 @@ public class AdminController {
         teachers.add(teacher1);
         
         return teachers;
-    }
-
-    /**
-     * 创建用户
-     * 
-     * @param user 用户信息
-     * @return 创建结果
-     */
-    @PostMapping("/create-user")
-    public String createUser(@RequestBody UserInfo user) {
-        // 模拟创建用户逻辑
-        return "创建成功";
-    }
-
-    /**
-     * 删除用户
-     * 
-     * @param userId 用户ID
-     * @return 删除结果
-     */
-    @DeleteMapping("/delete-user/{userId}")
-    public String deleteUser(@PathVariable Long userId) {
-        // 模拟删除用户逻辑
-        return "删除成功";
     }
 }

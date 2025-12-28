@@ -8,7 +8,10 @@ const isAuthenticated = ref(false)
 
 // 模拟检查登录状态
 onMounted(() => {
-  const token = localStorage.getItem('token')
+  let token = ''
+  if (typeof localStorage !== 'undefined') {
+    token = localStorage.getItem('token') || ''
+  }
   isAuthenticated.value = !!token
 })
 
@@ -18,31 +21,56 @@ const handleLogin = () => {
 }
 
 // 登出处理
-const handleLogout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('userInfo')
-  isAuthenticated.value = false
-  ElMessage.success('登出成功')
-  router.push('/login')
+const handleLogout = async () => {
+  try {
+    // 调用后端退出接口
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : ''
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+  } catch (error) {
+    console.error('退出失败:', error)
+  } finally {
+    // 清除本地存储，确保localStorage存在
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('userInfo')
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('loginFailCount')
+    }
+    isAuthenticated.value = false
+    ElMessage.success('登出成功')
+    router.push('/login')
+  }
 }
 </script>
 
 <template>
   <div class="app-container">
-    <!-- 导航栏 -->
-    <header class="app-header">
+    <!-- 导航栏 - 仅在非登录页面显示 -->
+    <header v-if="$route.name !== 'login'" class="app-header">
       <div class="header-left">
         <h1 class="app-title">哈尔滨金融学院毕业论文管理系统</h1>
       </div>
       <div class="header-right">
-        <el-button v-if="!isAuthenticated" type="primary" @click="handleLogin">登录</el-button>
-        <el-dropdown v-else>
-          <el-button type="primary">
-            {{ JSON.parse(localStorage.getItem('userInfo') || '{}').username || '用户' }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
-          </el-button>
+        <el-dropdown v-if="isAuthenticated">
+          <div class="user-info-container">
+            <el-avatar class="user-avatar" :size="40">
+              {{ JSON.parse((typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : '') || '{}').realName?.charAt(0) || '用' }}
+            </el-avatar>
+            <span class="user-name">{{ JSON.parse((typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : '') || '{}').realName || '用户' }}</span>
+            <el-icon class="arrow-down"><arrow-down /></el-icon>
+          </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+              <el-dropdown-item @click="handleLogout" class="logout-item">
+                <el-icon><switch-button /></el-icon>
+                退出登录
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -98,6 +126,52 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: all 0.3s ease;
+}
+
+.user-info-container:hover {
+  background-color: rgba(25, 137, 250, 0.1);
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 18px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #303133;
+  line-height: 1.5;
+}
+
+.arrow-down {
+  font-size: 16px;
+  color: #606266;
+}
+
+.logout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 12px 20px;
+  min-height: 44px;
+}
+
+.logout-item:hover {
+  background-color: rgba(25, 137, 250, 0.1);
 }
 
 .app-main {

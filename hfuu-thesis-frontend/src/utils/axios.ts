@@ -13,8 +13,11 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
-    // 从localStorage获取token
-    const token = localStorage.getItem('token')
+    // 从localStorage获取token，确保localStorage存在
+    let token = ''
+    if (typeof localStorage !== 'undefined') {
+      token = localStorage.getItem('token') || ''
+    }
     if (token) {
       // 设置请求头Authorization
       config.headers.Authorization = `Bearer ${token}`
@@ -30,6 +33,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const { data } = response
+    // 请求需要有code字段且为200
     if (data.code === 200) {
       return data
     } else {
