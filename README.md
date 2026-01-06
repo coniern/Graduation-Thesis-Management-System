@@ -124,7 +124,3 @@ A: 建议使用数据库定时备份（mysqldump / pg_dump）与对象存储（S
 - 仓库地址: https://github.com/coniern/Graduation-Thesis-Management-System
 - 作者: coniern
 
-附录：定制建议
-----
-- 若需要，我可以根据你选择的技术栈将 README 中的「快速开始」和「部署」部分替换为具体命令与示例（例如 Spring Boot + MySQL + Nginx + Docker Compose 的完整示例）。
-- 如果你提供项目现有代码结构（或把代码推上来），我可以把 README 调整为与代码一致的更精确说明。
